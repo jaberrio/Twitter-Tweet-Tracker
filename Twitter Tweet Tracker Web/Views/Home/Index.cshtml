@@ -1,0 +1,42 @@
+﻿@using Twitter_Tweet_Tracker_Web.Models
+@{
+    TTTUser user = (TTTUser)ViewBag.user;
+}
+<div class="wrapper">
+    <div class="logo">
+        <img src="https://www.freepnglogos.com/uploads/twitter-logo-png/twitter-bird-symbols-png-logo-0.png" alt="">
+    </div>
+    <div class="text-center mt-4 name">
+        Login using Twitter
+    </div>
+    <hr/>
+
+    @if (user != null)
+    {
+        <div class="row">
+            <div class="logo">
+                <img src="@user.profileImage" alt="">
+            </div>
+            <div class="m-aut">
+                <div class="text-center user-name">Logged in as: @user.name (@user.username)</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="m-auto">
+                @using (Html.BeginForm("Begin", "Engine", FormMethod.Post))
+                {
+                    <input hidden="true" name="userId" value="@user.user_id"/>
+                    <button type="submit" class="btn mt-3">Begin Profiling</button>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            <button type="submit" class="btn mt-3">Login</button>
+        }
+    }
+</div>
