@@ -177,6 +177,11 @@
     </Compile>
     <Compile Include="Models\AnalyzedTimeline.cs" />
     <Compile Include="Models\AnalyzedTweet.cs" />
+    <Compile Include="Models\Database\twitter-tweet-tracker-db.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>twitter-tweet-tracker-db.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Models\Twitter\TwitterTimeline.cs" />
     <Compile Include="Models\Twitter\TwitterUser.cs" />
     <Compile Include="Models\TTTUser.cs" />
@@ -216,6 +221,17 @@
     <Folder Include="Views\Data\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Models\Database\twitter-tweet-tracker-db.xsc">
+      <DependentUpon>twitter-tweet-tracker-db.xsd</DependentUpon>
+    </Content>
+    <None Include="Models\Database\twitter-tweet-tracker-db.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>twitter-tweet-tracker-db.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="Models\Database\twitter-tweet-tracker-db.xss">
+      <DependentUpon>twitter-tweet-tracker-db.xsd</DependentUpon>
+    </Content>
     <None Include="packages.config" />
     <Content Include="Views\Home\Dashboard.cshtml" />
   </ItemGroup>
