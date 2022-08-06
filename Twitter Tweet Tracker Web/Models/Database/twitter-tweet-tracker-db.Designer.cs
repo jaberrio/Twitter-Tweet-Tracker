@@ -7808,11 +7808,17 @@ namespace Twitter_Tweet_Tracker_Web.Models.Database._twitter_tweet_tracker_dbTab
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[1];
+            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[2];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = "SELECT *\r\nFROM     emoji_scores";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[1].Connection = this.Connection;
+            this._commandCollection[1].CommandText = "SELECT * FROM emoji_scores WHERE EXISTS\r\n(SELECT value FROM STRING_SPLIT(@unicode" +
+                "_searchCSV,\',\') where TRIM(value)<>\'\' AND unicode = value)";
+            this._commandCollection[1].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@unicode_searchCSV", global::System.Data.SqlDbType.VarChar, 1024, global::System.Data.ParameterDirection.Input, 0, 0, "", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -7821,6 +7827,23 @@ namespace Twitter_Tweet_Tracker_Web.Models.Database._twitter_tweet_tracker_dbTab
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
         public virtual _twitter_tweet_tracker_db.emoji_scoresDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
+            _twitter_tweet_tracker_db.emoji_scoresDataTable dataTable = new _twitter_tweet_tracker_db.emoji_scoresDataTable();
+            this.Adapter.Fill(dataTable);
+            return dataTable;
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, false)]
+        public virtual _twitter_tweet_tracker_db.emoji_scoresDataTable GetDataFor(string unicode_searchCSV) {
+            this.Adapter.SelectCommand = this.CommandCollection[1];
+            if ((unicode_searchCSV == null)) {
+                throw new global::System.ArgumentNullException("unicode_searchCSV");
+            }
+            else {
+                this.Adapter.SelectCommand.Parameters[0].Value = ((string)(unicode_searchCSV));
+            }
             _twitter_tweet_tracker_db.emoji_scoresDataTable dataTable = new _twitter_tweet_tracker_db.emoji_scoresDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
@@ -8544,11 +8567,17 @@ namespace Twitter_Tweet_Tracker_Web.Models.Database._twitter_tweet_tracker_dbTab
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
         private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[1];
+            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[2];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = "SELECT word_scores.*\r\nFROM     word_scores";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[1].Connection = this.Connection;
+            this._commandCollection[1].CommandText = "SELECT * FROM word_scores WHERE EXISTS\r\n(SELECT value FROM STRING_SPLIT(@searchCS" +
+                "V,\',\') where TRIM(value)<>\'\' AND word = value)";
+            this._commandCollection[1].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@searchCSV", global::System.Data.SqlDbType.VarChar, 1024, global::System.Data.ParameterDirection.Input, 0, 0, "", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -8557,6 +8586,23 @@ namespace Twitter_Tweet_Tracker_Web.Models.Database._twitter_tweet_tracker_dbTab
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
         public virtual _twitter_tweet_tracker_db.word_scoresDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
+            _twitter_tweet_tracker_db.word_scoresDataTable dataTable = new _twitter_tweet_tracker_db.word_scoresDataTable();
+            this.Adapter.Fill(dataTable);
+            return dataTable;
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, false)]
+        public virtual _twitter_tweet_tracker_db.word_scoresDataTable GetDataFor(string searchCSV) {
+            this.Adapter.SelectCommand = this.CommandCollection[1];
+            if ((searchCSV == null)) {
+                throw new global::System.ArgumentNullException("searchCSV");
+            }
+            else {
+                this.Adapter.SelectCommand.Parameters[0].Value = ((string)(searchCSV));
+            }
             _twitter_tweet_tracker_db.word_scoresDataTable dataTable = new _twitter_tweet_tracker_db.word_scoresDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
