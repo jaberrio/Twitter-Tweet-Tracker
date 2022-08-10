@@ -29,9 +29,24 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             surprise = 0,
             trust = 0
         };
+        private JsonResult adjust(AnalyzedTweetResult results)
+        {
+            results.anger += (float)(-0.0534);
+            results.anticipation += (float)(0.0263);
+            results.disgust += (float)(-0.0368);
+
+            results.fear += (float)(-0.0612);
+            results.joy += (float)(-0.0098);
+            results.sadness += (float)(-0.0701);
+
+            results.surprise += (float)(-0.094);
+            results.trust += (float)(-0.0399);
+            
+            return Json(results);
+        }
 
         // GET: Data
-        public JsonResult Begin(string userId)
+        public ActionResult Begin(string userId)
         {
             var twitter_timeline = GetUserTimeline(userId);
             var mention_timeline = GetUserReplies(userId);
@@ -93,25 +108,14 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 countIndex++;
             }
             
-            return adjust(finalScores);
-        }
-
-        private JsonResult adjust(AnalyzedTweetResult results)
-        {
-            results.anger += (float)(-0.0534);
-            results.anticipation += (float)(0.0263);
-            results.disgust += (float)(-0.0368);
-
-            results.fear += (float)(-0.0612);
-            results.joy += (float)(-0.0098);
-            results.sadness += (float)(-0.0701);
-
-            results.surprise += (float)(-0.094);
-            results.trust += (float)(-0.0399);
+            //return adjust(finalScores);
             
-            return Json(results);
-        }
 
+            var fs = JsonConvert.SerializeObject(adjust(finalScores));
+
+            return Redirect("/Home/Dashboard?redirect=" + HttpUtility.UrlEncode(fs));
+        }
+        
         private TwitterTimeline GetUserTimeline(string userId)
         {
             var access_token = Request.Cookies.Get("oauth_token");
