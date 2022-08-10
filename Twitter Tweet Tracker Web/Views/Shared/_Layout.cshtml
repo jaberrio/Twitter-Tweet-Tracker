@@ -12,15 +12,16 @@
 <body>
 <!-- Just an image -->
 <nav class="navbar navbar-light bg-light">
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand p-0 m-0" href="#">
         <img src="~/Content/img/logo.png" width="150" alt="" />
     </a>
     Twitter Tweet Tracker - Web
 </nav>
 <div class="container-fluid body-content">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     @RenderBody()
     @RenderSection("SPAViews", required: false)
-    <hr/>
+    <hr />
     <footer>
         <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
     </footer>
@@ -29,5 +30,7 @@
 @*@Scripts.Render("~/bundles/jquery")
         @Scripts.Render("~/bundles/bootstrap")*@
 @RenderSection("Scripts", required: false)
+
+
 </body>
 </html>

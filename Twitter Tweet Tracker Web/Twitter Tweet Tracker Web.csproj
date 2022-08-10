@@ -177,6 +177,7 @@
     </Compile>
     <Compile Include="Models\AnalyzedTimeline.cs" />
     <Compile Include="Models\AnalyzedTweet.cs" />
+    <Compile Include="Models\AnalyzedTweetResult.cs" />
     <Compile Include="Models\Database\twitter-tweet-tracker-db.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

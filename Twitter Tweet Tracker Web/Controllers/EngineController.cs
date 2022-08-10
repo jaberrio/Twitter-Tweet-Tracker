@@ -9,20 +9,84 @@ using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Authenticators.OAuth;
 using Twitter_Tweet_Tracker_Web.Models;
+using Twitter_Tweet_Tracker_Web.Models.Database;
+using Twitter_Tweet_Tracker_Web.Models.Database._twitter_tweet_tracker_dbTableAdapters;
 using Twitter_Tweet_Tracker_Web.Models.Twitter;
 
 namespace Twitter_Tweet_Tracker_Web.Controllers
 {
     public class EngineController : Controller
     {
+        AnalyzedTweetResult finalScores = new AnalyzedTweetResult
+        {
+            anger = 0,
+            anticipation = 0,
+            disgust = 0,
+            fear = 0,
+            joy = 0,
+            sadness = 0,
+            surprise = 0,
+            trust = 0
+        };
         // GET: Data
-        public ActionResult Begin(string userId)
+        public AnalyzedTweetResult Begin(string userId)
         {
             var twitter_timeline = GetUserTimeline(userId);
             var mention_timeline = GetUserReplies(userId);
             var analyzedTimeline = AnalyzeTimeline(userId, twitter_timeline, mention_timeline);
-            ViewBag.AnalyzedTimeline = analyzedTimeline;
-            return View();
+
+            int countIndex = 1;
+            foreach (var tweet in analyzedTimeline.Tweets)
+            {
+                var result = AnalyzeTweetScore(tweet.text);
+                if(result==null)
+                    continue;
+                AppendScoresToResults(result,countIndex);
+                countIndex++;
+                foreach (var reply in tweet.replies)
+                {
+                    result = AnalyzeTweetScore(tweet.text);
+                    if (result == null)
+                        continue;
+                    AppendScoresToResults(result, countIndex);
+                    countIndex++;
+                }
+            }
+
+            foreach (var reply in analyzedTimeline.Replies)
+            {
+                var result = AnalyzeTweetScore(reply.text);
+                if (result == null)
+                    continue;
+                AppendScoresToResults(result, countIndex);
+                countIndex++;
+                if(reply.parent_tweet == null)
+                    continue;
+                result = AnalyzeTweetScore(reply.parent_tweet.text);
+                if (result == null)
+                    continue;
+                AppendScoresToResults(result, countIndex);
+                countIndex++;
+            }
+
+            foreach (var retweet in analyzedTimeline.Retweets)
+            {
+                var result = AnalyzeTweetScore(retweet.text);
+                if (result == null)
+                    continue;
+                AppendScoresToResults(result, countIndex);
+                countIndex++;
+                if (retweet.parent_tweet == null)
+                    continue;
+                result = AnalyzeTweetScore(retweet.parent_tweet.text);
+                if (result == null)
+                    continue;
+                AppendScoresToResults(result, countIndex);
+                countIndex++;
+            }
+
+            ViewBag.results = finalScores;
+            return finalScores;
         }
 
         private TwitterTimeline GetUserTimeline(string userId)
@@ -160,6 +224,45 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             }
 
             return AnalyzedTimeline;
+        }
+
+        private AnalyzedTweetResult AnalyzeTweetScore(string tweetText)
+        {
+            var stringSplit = tweetText.Split(' ');
+            var tokenizedTweet = "";
+            foreach (var word in stringSplit)
+            {
+                tokenizedTweet += $"{word.ToLower().Replace(".","")},";
+            }
+
+            var wordScores = new word_scoresTableAdapter().GetDataFor(tokenizedTweet);
+            if (!wordScores.Any())
+                return null;
+            var result = new AnalyzedTweetResult
+            {
+                anger = (float) wordScores.Average(x=>x.anger),
+                anticipation = (float)wordScores.Average(x=>x.anticipation),
+                disgust = (float)wordScores.Average(x=>x.disgust),
+                fear = (float)wordScores.Average(x=>x.fear),
+                joy = (float)wordScores.Average(x=>x.joy),
+                sadness = (float)wordScores.Average(x=>x.sadness),
+                surprise = (float)wordScores.Average(x=>x.surprise),
+                trust = (float)wordScores.Average(x=>x.trust), 
+            };
+
+
+            return result;
+        }
+
+        private void AppendScoresToResults(AnalyzedTweetResult newResults, float count)
+        {
+            finalScores.anger = (finalScores.anger + newResults.anger) / count;
+            finalScores.disgust = (finalScores.disgust + newResults.disgust) / count;
+            finalScores.surprise = (finalScores.surprise + newResults.surprise) / count;
+            finalScores.trust = (finalScores.trust + newResults.trust) / count;
+            finalScores.anticipation = (finalScores.anticipation + newResults.anticipation) / count;
+            finalScores.fear = (finalScores.fear + newResults.fear) / count;
+            finalScores.joy = (finalScores.joy + newResults.joy) / count;
         }
     }
 }
