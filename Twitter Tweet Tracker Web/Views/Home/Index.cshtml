@@ -2,6 +2,10 @@
 @{
     TTTUser user = (TTTUser)ViewBag.user;
 }
+
+@*axios library*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js" integrity="sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <div class="wrapper">
     <div class="logo">
         <img src="https://www.freepnglogos.com/uploads/twitter-logo-png/twitter-bird-symbols-png-logo-0.png" alt="">
@@ -9,7 +13,7 @@
     <div class="text-center mt-4 name">
         Login using Twitter
     </div>
-    <hr/>
+    <hr />
 
     @if (user != null)
     {
@@ -25,9 +29,9 @@
         <div class="row">
             <div class="m-auto">
                 @*@using (Html.BeginForm("Begin", "Engine", FormMethod.Post))
-                {*@
-                    @* <input hidden="true" name="userId" value="@user.user_id"/> *@
-                    <button type="submit" class="btn mt-3">Begin Profiling</button>
+                    {*@
+                @* <input hidden="true" name="userId" value="@user.user_id"/> *@
+                <button onclick="BeginProfiling()" type="submit" class="btn mt-3">Begin Profiling</button>
                 @*}*@
             </div>
         </div>
@@ -42,5 +46,12 @@
 </div>
 
 <script type="text/javascript">
-
+    function BeginProfiling() {
+        axios.post('/engine/begin',
+            {
+                userId: '@(user?.user_id)'
+            }).then((res) => {
+            console.log(res.data);
+        });
+    }
 </script>

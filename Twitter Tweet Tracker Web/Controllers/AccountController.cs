@@ -88,7 +88,8 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                     
                 }
                 ViewBag.user = user;
-                return RedirectToAction("Index", "Home", new RouteValueDictionary(user));
+                TempData["user"] = user;
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception e)
             {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Authenticators.OAuth;
@@ -28,8 +29,9 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             surprise = 0,
             trust = 0
         };
+
         // GET: Data
-        public AnalyzedTweetResult Begin(string userId)
+        public JsonResult Begin(string userId)
         {
             var twitter_timeline = GetUserTimeline(userId);
             var mention_timeline = GetUserReplies(userId);
@@ -39,13 +41,15 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             foreach (var tweet in analyzedTimeline.Tweets)
             {
                 var result = AnalyzeTweetScore(tweet.text);
-                if(result==null)
+                if (result == null)
                     continue;
-                AppendScoresToResults(result,countIndex);
+                AppendScoresToResults(result, countIndex);
                 countIndex++;
                 foreach (var reply in tweet.replies)
                 {
-                    result = AnalyzeTweetScore(tweet.text);
+                    // if (reply == null || reply.text == null)
+                    //     continue;
+                    result = AnalyzeTweetScore(reply.text);
                     if (result == null)
                         continue;
                     AppendScoresToResults(result, countIndex);
@@ -60,7 +64,7 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                     continue;
                 AppendScoresToResults(result, countIndex);
                 countIndex++;
-                if(reply.parent_tweet == null)
+                if (reply.parent_tweet == null)
                     continue;
                 result = AnalyzeTweetScore(reply.parent_tweet.text);
                 if (result == null)
@@ -71,22 +75,25 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
 
             foreach (var retweet in analyzedTimeline.Retweets)
             {
-                var result = AnalyzeTweetScore(retweet.text);
-                if (result == null)
-                    continue;
-                AppendScoresToResults(result, countIndex);
-                countIndex++;
+                if (retweet.text != null)
+                {
+                    var _result = AnalyzeTweetScore(retweet.text);
+                    if (_result == null)
+                        continue;
+                    AppendScoresToResults(_result, countIndex);
+                    countIndex++;
+                }
+                
                 if (retweet.parent_tweet == null)
                     continue;
-                result = AnalyzeTweetScore(retweet.parent_tweet.text);
+                var result = AnalyzeTweetScore(retweet.parent_tweet.text);
                 if (result == null)
                     continue;
                 AppendScoresToResults(result, countIndex);
                 countIndex++;
             }
-
-            ViewBag.results = finalScores;
-            return finalScores;
+            
+            return Json(finalScores);
         }
 
         private TwitterTimeline GetUserTimeline(string userId)
@@ -174,7 +181,7 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             var AnalyzedTimeline = new AnalyzedTimeline();
             AnalyzedTimeline.User = User;
 
-            foreach (var item in timeline.data)
+            foreach (var item in timeline?.data)
             {
                 // AnalyzedTweet tweet = new AnalyzedTweet() { id = item.id };
                 if (item?.referenced_tweets != null)
@@ -192,7 +199,7 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                         {
                             var _retweet = new TweetReply() { id = item.id, text = item.text };
                             var _parent = timeline.includes.tweets.First(x => x.id == referenced.id);
-                            var _analyzedParent = new AnalyzedTweet() { id = _parent.id };
+                            var _analyzedParent = new AnalyzedTweet() { id = _parent.id, text = _parent.text };
                             _retweet.parent_tweet = _analyzedParent;
                             AnalyzedTimeline.Retweets.Add(_retweet);
                         }
@@ -232,7 +239,7 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             var tokenizedTweet = "";
             foreach (var word in stringSplit)
             {
-                tokenizedTweet += $"{word.ToLower().Replace(".","")},";
+                tokenizedTweet += $"{word.ToLower().Replace(".", "")},";
             }
 
             var wordScores = new word_scoresTableAdapter().GetDataFor(tokenizedTweet);
@@ -240,14 +247,14 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 return null;
             var result = new AnalyzedTweetResult
             {
-                anger = (float) wordScores.Average(x=>x.anger),
-                anticipation = (float)wordScores.Average(x=>x.anticipation),
-                disgust = (float)wordScores.Average(x=>x.disgust),
-                fear = (float)wordScores.Average(x=>x.fear),
-                joy = (float)wordScores.Average(x=>x.joy),
-                sadness = (float)wordScores.Average(x=>x.sadness),
-                surprise = (float)wordScores.Average(x=>x.surprise),
-                trust = (float)wordScores.Average(x=>x.trust), 
+                anger = (float)wordScores.Average(x => x.anger),
+                anticipation = (float)wordScores.Average(x => x.anticipation),
+                disgust = (float)wordScores.Average(x => x.disgust),
+                fear = (float)wordScores.Average(x => x.fear),
+                joy = (float)wordScores.Average(x => x.joy),
+                sadness = (float)wordScores.Average(x => x.sadness),
+                surprise = (float)wordScores.Average(x => x.surprise),
+                trust = (float)wordScores.Average(x => x.trust),
             };
 
 

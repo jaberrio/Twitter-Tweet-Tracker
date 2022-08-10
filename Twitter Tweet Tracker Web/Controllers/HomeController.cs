@@ -10,8 +10,9 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
     public class HomeController : Controller
     {
         
-        public ActionResult Index(TTTUser user)
+        public ActionResult Index()
         {
+            var user = (TTTUser) TempData["user"];
             if (!string.IsNullOrWhiteSpace(user?.oAuthSecret))
             {
                 ViewBag.user = user;
@@ -26,7 +27,6 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 Response.Cookies.Add(oauth_token_secret_cookie);
             }
 
-            
             return View();
         }
 
