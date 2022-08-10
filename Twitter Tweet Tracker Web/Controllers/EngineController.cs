@@ -93,7 +93,23 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 countIndex++;
             }
             
-            return Json(finalScores);
+            return adjust(finalScores);
+        }
+
+        private JsonResult adjust(AnalyzedTweetResult results)
+        {
+            results.anger += (float)(-0.0534);
+            results.anticipation += (float)(0.0263);
+            results.disgust += (float)(-0.0368);
+
+            results.fear += (float)(-0.0612);
+            results.joy += (float)(-0.0098);
+            results.sadness += (float)(-0.0701);
+
+            results.surprise += (float)(-0.094);
+            results.trust += (float)(-0.0399);
+            
+            return Json(results);
         }
 
         private TwitterTimeline GetUserTimeline(string userId)
