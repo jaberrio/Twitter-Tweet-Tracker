@@ -29,7 +29,7 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             surprise = 0,
             trust = 0
         };
-        private JsonResult adjust(AnalyzedTweetResult results)
+        private AnalyzedTweetResult adjust(AnalyzedTweetResult results)
         {
             results.anger += (float)(-0.0534);
             results.anticipation += (float)(0.0263);
@@ -41,12 +41,12 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
 
             results.surprise += (float)(-0.094);
             results.trust += (float)(-0.0399);
-            
-            return Json(results);
+
+            return results;
         }
 
         // GET: Data
-        public ActionResult Begin(string userId)
+        public JsonResult AnalyzeProfile(string userId)
         {
             var twitter_timeline = GetUserTimeline(userId);
             var mention_timeline = GetUserReplies(userId);
@@ -109,11 +109,12 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             }
             
             //return adjust(finalScores);
-            
-
-            var fs = JsonConvert.SerializeObject(adjust(finalScores));
-
-            return Redirect("/Home/Dashboard?redirect=" + HttpUtility.UrlEncode(fs));
+            var analyzedProfile = new AnalyzedProfile()
+            {
+                timeline = analyzedTimeline,
+                overallResults = adjust(finalScores)
+            };
+            return Json(analyzedProfile);
         }
         
         private TwitterTimeline GetUserTimeline(string userId)

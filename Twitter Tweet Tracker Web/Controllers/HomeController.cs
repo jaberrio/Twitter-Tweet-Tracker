@@ -30,8 +30,11 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             return View();
         }
 
-        public ActionResult Dashboard()
+        [HttpPost]
+        public ActionResult Dashboard(TTTUser user)
         {
+            ViewBag.user = user;
+            Console.Write(ViewBag.user);
             return View();
         }
     }

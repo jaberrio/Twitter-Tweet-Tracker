@@ -3,8 +3,9 @@
     TTTUser user = (TTTUser)ViewBag.user;
 }
 
-@*axios library*@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js" integrity="sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    let dataLoaded = false;
+</script>
 
 <div class="wrapper">
     <div class="logo">
@@ -28,10 +29,17 @@
 
         <div class="row">
             <div class="m-auto">
-                @using (Html.BeginForm("Begin", "Engine", FormMethod.Post))
+                @*@Html.ActionLink("Begin Profiling","Dashboard","Home",new {@class="btn mt-3"})*@
+                @using (Html.BeginForm("Dashboard", "Home", FormMethod.Post))
                     {
-                        <input hidden="true" name="userId" value="@user.user_id"/>
-                        <button onclick="BeginProfiling()" type="submit" class="btn mt-3">Begin Profiling</button>
+                        <input hidden="true" name="user_id" value="@user.user_id"/>
+                        <input hidden="true" name="username" value="@user.username"/>
+                        <input hidden="true" name="name" value="@user.name"/>
+                        <input hidden="true" name="profileImage" value="@user.profileImage"/>
+                        <input hidden="true" name="following_count" type="number" value="@user.following_count"/>
+                        <input hidden="true" name="followers_count" type="number" value="@user.followers_count"/>
+                        <input hidden="true" name="tweet_count" type="number" value="@user.tweet_count"/>
+                        <button type="submit" class="btn mt-3">Begin Profiling</button>
                     }
             </div>
         </div>
@@ -44,14 +52,3 @@
         }
     }
 </div>
-
-<script type="text/javascript">
-    function BeginProfiling() {
-        axios.post('/engine/begin',
-            {
-                userId: '@(user?.user_id)'
-            }).then((res) => {
-            console.log(res.data);
-        });
-    }
-</script>

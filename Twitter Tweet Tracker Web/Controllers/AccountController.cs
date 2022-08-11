@@ -117,7 +117,7 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             try
             {
                 var request = new RestRequest($"users/{userId}");
-                request.AddParameter("user.fields", "profile_image_url");
+                request.AddParameter("user.fields", "profile_image_url,public_metrics");
                 var response = client.Execute(request);
                 var data = response.Content;
                 if (!string.IsNullOrWhiteSpace(data))
@@ -129,7 +129,6 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             }
             catch (Exception e)
             {
-                
             }
             return null;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Antlr.Runtime.Misc;
 using Twitter_Tweet_Tracker_Web.Models.Twitter;
 
