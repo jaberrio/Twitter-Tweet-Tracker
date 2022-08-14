@@ -27,7 +27,7 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             {
                 Authenticator = new OAuth1Authenticator()
                 {
-                    CallbackUrl = isLocalEnv ? "https://localhost:44313/account/logincallback" : "",
+                    CallbackUrl = isLocalEnv ? "https://localhost:44313/account/logincallback" : "https://twitter-tweet-tracker.azurewebsites.net/account/logincallback",
                     ConsumerKey = ConfigurationManager.AppSettings["twitterAPIKey"],
                     ConsumerSecret = ConfigurationManager.AppSettings["twitterAPISecret"],
                     SignatureMethod = OAuthSignatureMethod.HmacSha1
@@ -79,17 +79,10 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 {
                     user.name = _twitterUser.data?.name;
                     user.profileImage = _twitterUser.data?.profile_image_url;
-                    if (_twitterUser.data?.public_metrics != null)
-                    {
-                        user.followers_count = _twitterUser.data.public_metrics.followers_count;
-                        user.following_count = _twitterUser.data.public_metrics.following_count;
-                        user.tweet_count = _twitterUser.data.public_metrics.tweet_count;
-                    }
-                    
                 }
-                ViewBag.user = user;
+                //ViewBag.user = user;
                 TempData["user"] = user;
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard", "Home");
             }
             catch (Exception e)
             {

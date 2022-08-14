@@ -194,6 +194,7 @@
   <ItemGroup>
     <Content Include="Content\base.css" />
     <Content Include="Content\img\logo.png" />
+    <Content Include="Content\img\logo_border.png" />
     <Content Include="Content\login.css" />
     <Content Include="Content\profile.css" />
     <Content Include="favicon.ico" />
@@ -202,7 +203,6 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
-    <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
@@ -236,6 +236,7 @@
     </Content>
     <None Include="packages.config" />
     <Content Include="Views\Home\Dashboard.cshtml" />
+    <None Include="Properties\PublishProfiles\twitter-tweet-tracker - Web Deploy.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

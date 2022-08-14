@@ -3,6 +3,7 @@
     border-radius: 3px;
     margin-bottom: 30px;
     background-color: #fff;
+    min-height: 270px;
 }
 
 .social-links li a {

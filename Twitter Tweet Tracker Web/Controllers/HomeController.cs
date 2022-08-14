@@ -12,7 +12,14 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
         
         public ActionResult Index()
         {
-            var user = (TTTUser) TempData["user"];
+            return View();
+        }
+        
+        public ActionResult Dashboard()
+        {
+            var user = (TTTUser)TempData["user"];
+            if (user == null)
+                return RedirectToAction("Index");
             if (!string.IsNullOrWhiteSpace(user?.oAuthSecret))
             {
                 ViewBag.user = user;
@@ -26,15 +33,7 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 Response.Cookies.Add(oauth_token_cookie);
                 Response.Cookies.Add(oauth_token_secret_cookie);
             }
-
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult Dashboard(TTTUser user)
-        {
-            ViewBag.user = user;
-            Console.Write(ViewBag.user);
+            else return RedirectToAction("Index");
             return View();
         }
     }

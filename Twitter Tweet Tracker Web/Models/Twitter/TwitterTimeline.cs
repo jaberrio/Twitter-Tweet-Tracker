@@ -26,6 +26,8 @@ namespace Twitter_Tweet_Tracker_Web.Models.Twitter
         public string conversation_id { get; set; }
         public string id { get; set; }
         public string text { get; set; }
+
+        public DateTime created_at { get; set; }
         public Referenced_Tweets[] referenced_tweets { get; set; }
     }
 

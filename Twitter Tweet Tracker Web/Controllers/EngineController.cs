@@ -2,33 +2,20 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Authenticators.OAuth;
 using Twitter_Tweet_Tracker_Web.Models;
-using Twitter_Tweet_Tracker_Web.Models.Database;
 using Twitter_Tweet_Tracker_Web.Models.Database._twitter_tweet_tracker_dbTableAdapters;
 using Twitter_Tweet_Tracker_Web.Models.Twitter;
+using ReferenceType = Twitter_Tweet_Tracker_Web.Models.Twitter.ReferenceType;
 
 namespace Twitter_Tweet_Tracker_Web.Controllers
 {
     public class EngineController : Controller
     {
-        AnalyzedTweetResult finalScores = new AnalyzedTweetResult
-        {
-            anger = 0,
-            anticipation = 0,
-            disgust = 0,
-            fear = 0,
-            joy = 0,
-            sadness = 0,
-            surprise = 0,
-            trust = 0
-        };
         private AnalyzedTweetResult adjust(AnalyzedTweetResult results)
         {
             results.anger += (float)(-0.0534);
@@ -45,9 +32,33 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             return results;
         }
 
-        // GET: Data
-        public JsonResult AnalyzeProfile(string userId)
+        [HttpPost]
+        public string GetOverallResult(string userId)
         {
+            AnalyzedTweetResult finalScores = new AnalyzedTweetResult
+            {
+                anger = 0,
+                anticipation = 0,
+                disgust = 0,
+                fear = 0,
+                joy = 0,
+                sadness = 0,
+                surprise = 0,
+                trust = 0
+            };
+            AnalyzedTweetResultOverTime resultOverTime = new AnalyzedTweetResultOverTime()
+            {
+                anger = new List<float>(),
+                anticipation = new List<float>(),
+                disgust = new List<float>(),
+                fear = new List<float>(),
+                joy = new List<float>(),
+                sadness = new List<float>(),
+                surprise = new List<float>(),
+                trust = new List<float>(),
+            };
+            List<DateTime> times = new List<DateTime>();
+
             var twitter_timeline = GetUserTimeline(userId);
             var mention_timeline = GetUserReplies(userId);
             var analyzedTimeline = AnalyzeTimeline(userId, twitter_timeline, mention_timeline);
@@ -58,7 +69,9 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 var result = AnalyzeTweetScore(tweet.text);
                 if (result == null)
                     continue;
-                AppendScoresToResults(result, countIndex);
+                AppendScoresToResults(result, ref finalScores, countIndex);
+                AddResultToTimeResults(result, ref resultOverTime);
+                times.Add(tweet.created_at);
                 countIndex++;
                 foreach (var reply in tweet.replies)
                 {
@@ -67,7 +80,10 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                     result = AnalyzeTweetScore(reply.text);
                     if (result == null)
                         continue;
-                    AppendScoresToResults(result, countIndex);
+                    AppendScoresToResults(result, ref finalScores, countIndex);
+                    AddResultToTimeResults(result, ref resultOverTime);
+                    times.Add(tweet.created_at);
+
                     countIndex++;
                 }
             }
@@ -77,14 +93,22 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 var result = AnalyzeTweetScore(reply.text);
                 if (result == null)
                     continue;
-                AppendScoresToResults(result, countIndex);
+                AppendScoresToResults(result, ref finalScores, countIndex);
+                AddResultToTimeResults(result, ref resultOverTime);
+                times.Add(reply.created_at);
+
+
                 countIndex++;
                 if (reply.parent_tweet == null)
                     continue;
                 result = AnalyzeTweetScore(reply.parent_tweet.text);
                 if (result == null)
                     continue;
-                AppendScoresToResults(result, countIndex);
+                AppendScoresToResults(result, ref finalScores, countIndex);
+                AddResultToTimeResults(result, ref resultOverTime);
+                times.Add(reply.created_at);
+
+
                 countIndex++;
             }
 
@@ -95,7 +119,10 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                     var _result = AnalyzeTweetScore(retweet.text);
                     if (_result == null)
                         continue;
-                    AppendScoresToResults(_result, countIndex);
+                    AppendScoresToResults(_result, ref finalScores, countIndex);
+                    AddResultToTimeResults(_result, ref resultOverTime);
+                    times.Add(retweet.created_at);
+
                     countIndex++;
                 }
                 
@@ -104,17 +131,23 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                 var result = AnalyzeTweetScore(retweet.parent_tweet.text);
                 if (result == null)
                     continue;
-                AppendScoresToResults(result, countIndex);
+                AppendScoresToResults(result, ref finalScores, countIndex);
+                AddResultToTimeResults(result, ref resultOverTime);
+                times.Add(retweet.created_at);
+
+
                 countIndex++;
             }
-            
-            //return adjust(finalScores);
-            var analyzedProfile = new AnalyzedProfile()
+            var overallResults = adjust(finalScores);
+
+            var results = new
             {
-                timeline = analyzedTimeline,
-                overallResults = adjust(finalScores)
+                overallResults = overallResults,
+                resultsOverTime = resultOverTime,
+                times = times,
+                timeline = analyzedTimeline
             };
-            return Json(analyzedProfile);
+            return JsonConvert.SerializeObject(results);
         }
         
         private TwitterTimeline GetUserTimeline(string userId)
@@ -138,7 +171,8 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             {
                 var request = new RestRequest($"users/{userId}/tweets");
                 request.AddParameter("expansions", "referenced_tweets.id");
-                request.AddParameter("tweet.fields", "referenced_tweets,conversation_id");
+                request.AddParameter("tweet.fields", "referenced_tweets,conversation_id,created_at");
+                request.AddParameter("max_results", ConfigurationManager.AppSettings["maxTweetToUse"]);
                 var response = client.Execute(request);
                 var data = response.Content;
                 if (!string.IsNullOrWhiteSpace(data))
@@ -192,6 +226,9 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             return null;
         }
 
+        /// <summary>
+        /// reads the unorganized timeline and classifies tweets, retweets, quotes and replies of the user
+        /// </summary>
         private AnalyzedTimeline AnalyzeTimeline(string userId, TwitterTimeline timeline,
             TwitterTimeline mentionTimeline)
         {
@@ -210,39 +247,42 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
                     {
                         if (referenced.type == ReferenceType.replied_to)
                         {
-                            var _reply = new TweetReply() { id = item.id, text = item.text };
-                            var _parent = timeline.includes.tweets.First(x => x.id == referenced.id);
-                            var _analyzedParent = new AnalyzedTweet() { id = _parent.id, text = _parent.text };
-                            _reply.parent_tweet = _analyzedParent;
+                            var _reply = new TweetReply() { id = item.id, text = item.text, created_at = item.created_at};
+                            var _parent = timeline?.includes.tweets.FirstOrDefault(x => x.id == referenced?.id);
+                            if (_parent != null)
+                            {
+                                var _analyzedParent = new AnalyzedTweet() { id = _parent.id, text = _parent.text, created_at = _parent.created_at };
+                                _reply.parent_tweet = _analyzedParent;
+                            }
                             AnalyzedTimeline.Replies.Add(_reply);
                         }
                         else if (referenced.type == ReferenceType.retweeted)
                         {
-                            var _retweet = new TweetReply() { id = item.id, text = item.text };
+                            var _retweet = new TweetReply() { id = item.id, text = item.text, created_at = item.created_at};
                             var _parent = timeline.includes.tweets.First(x => x.id == referenced.id);
-                            var _analyzedParent = new AnalyzedTweet() { id = _parent.id, text = _parent.text };
+                            var _analyzedParent = new AnalyzedTweet() { id = _parent.id, text = _parent.text , created_at = _parent.created_at};
                             _retweet.parent_tweet = _analyzedParent;
                             AnalyzedTimeline.Retweets.Add(_retweet);
                         }
 
                         else if (referenced.type == ReferenceType.quoted)
                         {
-                            var _retweet = new TweetReply() { id = item.id, text = item.text };
+                            var _retweet = new TweetReply() { id = item.id, text = item.text, created_at = item.created_at};
                             var _parent = timeline.includes.tweets.First(x => x.id == referenced.id);
-                            var _analyzedParent = new AnalyzedTweet() { id = _parent.id, text = _parent.text };
+                            var _analyzedParent = new AnalyzedTweet() { id = _parent.id, text = _parent.text, created_at = _parent.created_at};
                             _retweet.parent_tweet = _analyzedParent;
                             AnalyzedTimeline.Retweets.Add(_retweet);
                         }
                     }
                 else
                 {
-                    var _analyzedTweet = new AnalyzedTweet() { id = item.id, text = item.text };
+                    var _analyzedTweet = new AnalyzedTweet() { id = item.id, text = item.text, created_at = item.created_at};
                     //get the replies for the tweet
                     foreach (var t in mentionTimeline?.data)
                     {
                         if (t.conversation_id == item.conversation_id)
                         {
-                            var _treply = new TweetReply() { id = t.id, text = t.text };
+                            var _treply = new TweetReply() { id = t.id, text = t.text, created_at = t.created_at};
                             _analyzedTweet.replies.Add(_treply);
                         }
                     }
@@ -282,15 +322,26 @@ namespace Twitter_Tweet_Tracker_Web.Controllers
             return result;
         }
 
-        private void AppendScoresToResults(AnalyzedTweetResult newResults, float count)
+        private void AppendScoresToResults(AnalyzedTweetResult newResults, ref AnalyzedTweetResult oldResult, float count)
         {
-            finalScores.anger = (finalScores.anger + newResults.anger) / count;
-            finalScores.disgust = (finalScores.disgust + newResults.disgust) / count;
-            finalScores.surprise = (finalScores.surprise + newResults.surprise) / count;
-            finalScores.trust = (finalScores.trust + newResults.trust) / count;
-            finalScores.anticipation = (finalScores.anticipation + newResults.anticipation) / count;
-            finalScores.fear = (finalScores.fear + newResults.fear) / count;
-            finalScores.joy = (finalScores.joy + newResults.joy) / count;
+            oldResult.anger = (oldResult.anger + newResults.anger) / count;
+            oldResult.disgust = (oldResult.disgust + newResults.disgust) / count;
+            oldResult.surprise = (oldResult.surprise + newResults.surprise) / count;
+            oldResult.trust = (oldResult.trust + newResults.trust) / count;
+            oldResult.anticipation = (oldResult.anticipation + newResults.anticipation) / count;
+            oldResult.fear = (oldResult.fear + newResults.fear) / count;
+            oldResult.joy = (oldResult.joy + newResults.joy) / count;
+        }
+
+        private void AddResultToTimeResults(AnalyzedTweetResult newResult, ref AnalyzedTweetResultOverTime resultOverTime)
+        {
+            resultOverTime.anger.Add(newResult.anger);
+            resultOverTime.disgust.Add(newResult.disgust);
+            resultOverTime.surprise.Add(newResult.surprise);
+            resultOverTime.trust.Add(newResult.trust);
+            resultOverTime.anticipation.Add(newResult.anticipation);
+            resultOverTime.fear.Add(newResult.fear);
+            resultOverTime.joy.Add(newResult.joy);
         }
     }
 }

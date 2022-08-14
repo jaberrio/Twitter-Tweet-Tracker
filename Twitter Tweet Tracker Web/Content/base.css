@@ -1,10 +1,16 @@
 ﻿body {
     background: #ecf0f3;
+    height: 100% !important;
 }
 
 .progress-bar {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+}
+
+.scrolling-list {
+    overflow: auto;
+    height: 190px;
 }
 
 

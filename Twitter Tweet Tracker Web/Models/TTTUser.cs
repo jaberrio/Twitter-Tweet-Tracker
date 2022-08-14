@@ -13,8 +13,5 @@ namespace Twitter_Tweet_Tracker_Web.Models
         public string username { get; set; }
         public string name { get; set; }
         public string profileImage { get; set; }
-        public int followers_count { get; set; }
-        public int following_count { get; set; }
-        public int tweet_count { get; set; }
     }
 }

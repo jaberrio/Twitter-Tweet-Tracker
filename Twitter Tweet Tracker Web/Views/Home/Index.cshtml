@@ -1,13 +1,4 @@
-﻿@using Twitter_Tweet_Tracker_Web.Models
-@{
-    TTTUser user = (TTTUser)ViewBag.user;
-}
-
-<script type="text/javascript">
-    let dataLoaded = false;
-</script>
-
-<div class="wrapper">
+﻿<div class="wrapper">
     <div class="logo">
         <img src="https://www.freepnglogos.com/uploads/twitter-logo-png/twitter-bird-symbols-png-logo-0.png" alt="">
     </div>
@@ -16,39 +7,56 @@
     </div>
     <hr />
 
-    @if (user != null)
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
     {
-        <div class="row">
-            <div class="logo">
-                <img src="@user.profileImage" alt="">
-            </div>
-            <div class="m-aut">
-                <div class="text-center user-name">Logged in as: @user.name (@user.username)</div>
-            </div>
-        </div>
+        <button type="submit" class="btn mt-3">Login</button>
+    }
 
-        <div class="row">
-            <div class="m-auto">
-                @*@Html.ActionLink("Begin Profiling","Dashboard","Home",new {@class="btn mt-3"})*@
-                @using (Html.BeginForm("Dashboard", "Home", FormMethod.Post))
-                    {
-                        <input hidden="true" name="user_id" value="@user.user_id"/>
-                        <input hidden="true" name="username" value="@user.username"/>
-                        <input hidden="true" name="name" value="@user.name"/>
-                        <input hidden="true" name="profileImage" value="@user.profileImage"/>
-                        <input hidden="true" name="following_count" type="number" value="@user.following_count"/>
-                        <input hidden="true" name="followers_count" type="number" value="@user.followers_count"/>
-                        <input hidden="true" name="tweet_count" type="number" value="@user.tweet_count"/>
-                        <button type="submit" class="btn mt-3">Begin Profiling</button>
-                    }
-            </div>
-        </div>
-    }
-    else
-    {
-        using (Html.BeginForm("Login", "Account", FormMethod.Post))
-        {
-            <button type="submit" class="btn mt-3">Login</button>
-        }
-    }
+    <hr />
+    <div class="text-center">
+        By clicking login, you accept to use cookies on twitter tweet tracker web
+        and upon successful authentication your provide authorization to Twitter Tweet Tracker to read your timeline
+        and analyze your timeline for emotional profiling
+    </div>
 </div>
+<hr/>
+<p class="container">
+    Twitter Tweet Tracker takes in tweets, replies, quotes and retweet data from authenticated individual accounts
+    and generates a emotion based personality model. This application is designed to identify the quality and emotional score of your
+    twitter account and personality. The project also showcases the ability to use twitter and the algorithms to 
+    determine the stability and quality of the societal presence of a user in twitter. Using word analysis and key context clues, 
+    we can create a model of a twitter user who might be experiencing distress and other abnormal emotional spikes.
+    Because of the rapid nature of twitter, it can be hard for individuals to keep track of their tweets and its contextual quality. 
+    Thus,  this application can help users check themselves of their twitter accounts over large period of time.
+</p>
+
+<p class="container">
+    Authentication: Use the button below to sign in to your twitter account. Please note that you will be redirected
+    to twitter for authentication and Twitter Tweet Tracker will only use your authenticated and authorized data. Twitter Tweet Tracker
+    does not deal with any credentials and does not store any information from the analyze.
+</p>
+
+<p class="container">
+    Studies used: Predicting Personality with Social Media (Jennifer Golbeck, Cristina Robles, Karen Turner), 
+    May 2011 - Used significance data of personality traits to assign parameters and weights -
+    Used personality data to formulate analysis algorithms
+</p>
+
+<p class="container">
+    This is originally a Hackathon project <a href="https://devpost.com/software/toast2-0_sh19">presented</a> on ShellHacks 2019 and was revised for web in 2022. About 
+    1 million tweets were analyzed to determine a global bias for the models.
+</p>
+
+
+<p class="container">
+    <b>
+        Developers:
+        <ul class="container">
+            <li>Jullian Berrio (ja.berrio@ufl.edu)</li>
+            <li>Peyton Marinelli  (pmarinelli@ufl.edu)</li>
+            <li>Ahsan Rohan  (ahsanrohan@ufl.edu)</li>
+            <li>Mohammad Immam  (m.immam@ufl.edu)</li>
+        </ul>
+    </b>
+</p>
+

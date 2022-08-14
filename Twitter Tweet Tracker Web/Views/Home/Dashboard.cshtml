@@ -8,9 +8,11 @@
 
 
 <div class="row mt-2">
-    @*<div id="loader" class="loader-background">
+
+    <div id="loader" class="loader-background d-none">
+        Hang tight, there is alot of data to analyze...
         <div class="loader"></div>
-    </div>*@
+        </div>
     <div class="col-12 col-lg-3">
         <div class="text-center card-box">
             <div class="member-card pt-2 pb-2">
@@ -27,25 +29,14 @@
                     </p>
                 </div>
 
-                <div class="row">
-                    <div class="col-4">
-                        <div class="mt-1">
-                            <h4>@user.tweet_count</h4>
-                            <p class="mb-0 text-muted">Tweets</p>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="mt-1">
-                            <h4>@user.followers_count</h4>
-                            <p class="mb-0 text-muted">Followers</p>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="mt-1">
-                            <h4>@user.following_count</h4>
-                            <p class="mb-0 text-muted">Following</p>
-                        </div>
-                    </div>
+                <div class="row" id="profile_details">
+                    <button onclick="BeginProfiling()" class="btn btn-rounded m-auto btn-primary">Begin Profiling</button>
+                    <p class="text-center">
+                        By clicking begin, you agree to authorize Twitter Tweet Tracker to analyze your profile and
+                        score your account emotionally based on your public tweets. Your most recent 100 
+                        tweets/retweets/replies/quotes will be analyzed. <br/>Note: Depending on your account history, the process may
+                        take a long time.
+                    </p>
                 </div>
             </div>
         </div>
@@ -53,7 +44,7 @@
     </div>
 
 
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-lg-9">
 
         @*
                 <div class="row mb-2">
@@ -75,129 +66,137 @@
         *@
 
         <div class="row mb-2">
-            <div class="col-12 col-md-6 mb-2">
+            <div class="col-12 col-md-4 mb-2">
                 <div class="card w-100">
                     <div class="card-body">
-                        <h5 class="card-title">Recent Tweets</h5>
+                        <h5 class="card-title">Most Recent Tweets</h5>
                     </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Cras justo odio</li>
-                        <li class="list-group-item">Dapibus ac facilisis in</li>
-                        <li class="list-group-item">Vestibulum at eros</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 mb-2">
-                <div class="card w-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Recent Retweets</h5>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Cras justo odio</li>
-                        <li class="list-group-item">Dapibus ac facilisis in</li>
-                        <li class="list-group-item">Vestibulum at eros</li>
-                    </ul>
-                </div>
-            </div>
+                    <ul class="list-group list-group-flush scrolling-list" id="recent_tweet">
+                        <li class="list-group-item loadings">no data yet..</li>
 
+                        @*<li class="list-group-item">Cras justo odio</li>
+                            <li class="list-group-item">Dapibus ac facilisis in</li>
+                            <li class="list-group-item">Vestibulum at eros</li>*@
+                    </ul>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 mb-2">
+                <div class="card w-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Most Recent Retweets</h5>
+                    </div>
+                    <ul class="list-group list-group-flush scrolling-list" id="recent_retweet">
+                        <li class="list-group-item loadings">no data yet..</li>
+
+                        @*<li class="list-group-item">Cras justo odio</li>
+                            <li class="list-group-item">Dapibus ac facilisis in</li>
+                            <li class="list-group-item">Vestibulum at eros</li>*@
+                    </ul>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 mb-2">
+                <div class="card w-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Most Recent Replies</h5>
+                    </div>
+                    <ul class="list-group list-group-flush scrolling-list" id="recent_replies">
+                        <li class="list-group-item loadings">no data yet..</li>
+                        @*<li class="list-group-item">Cras justo odio</li>
+                    <li class="list-group-item">Dapibus ac facilisis in</li>
+                    <li class="list-group-item">Vestibulum at eros</li>*@
+                    </ul>
+                </div>
+            </div>
         </div>
 
     </div>
+
+
+</div>
+
+<div class="row">
 
 
     <div class="col-12 col-md-3">
         <div class="col-12">
-            <canvas id="myChart-1" width="300" height="300"></canvas>
-        </div>
-    </div>
-</div>
+            <div class="loadings">no data yet...</div>
 
-<div class="row">
-    <div class="col-12 col-md-3">
-        <div class="card w-100">
-            <div class="card-body">
-                <h5 class="card-title">Most Used Words</h5>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">Cras justo odio</li>
-                <li class="list-group-item">Dapibus ac facilisis in</li>
-                <li class="list-group-item">Vestibulum at eros</li>
-            </ul>
+            <canvas id="myChart-1" width="300" height="300">loading..</canvas>
         </div>
     </div>
 
-    <div class="col-12 col-md-4 mb-2">
-        <div class="card w-100">
-            <div class="card-body">
-                <h5 class="card-title">Recent Replies</h5>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">Cras justo odio</li>
-                <li class="list-group-item">Dapibus ac facilisis in</li>
-                <li class="list-group-item">Vestibulum at eros</li>
-            </ul>
+    <div class="col-12 col-md-6">
+        <div class="col-12">
+            <div class="loadings">no data yet...</div>
+            <canvas id="myChart-2" style="width: 100%; height: auto; min-height: 300px">
+            </canvas>
         </div>
     </div>
-
-    <div class="col-12 col-md-4">
-        <canvas id="myChart-2" width="500" height="300">
-            loading..
-        </canvas>
-    </div>
-</div>
 
 @*radar chart code*@
 <script type="text/javascript" async="true">
-    window.onload = () => {
-        axios.post('/engine/analyzeprofile',
-            {
-                userId: '@(user?.user_id)'
-            }).then((res) => {
-            console.log(res.data);
-            document.getElementById('loader').classList.add('d-none');
-            const ctx = document.getElementById(`myChart-1`).getContext('2d');
-            const myChart = new Chart(ctx,
-                {
-                    type: 'radar',
-                    data: {
-                        labels: [
-                            'Anger',
-                            'Anticipation',
-                            'Disgust',
-                            'Fear',
-                            'Joy',
-                            'Sadnaess',
-                            'Surprise',
-                            'Trust',
-                        ],
-                        datasets: [
-                            {
-                                label: 'Personality Scoring',
-                                data: [res?.data?.overallResults?.anger, res?.data?.overallResults?.anticipation, res?.data?.overallResults?.disgust, res?.data?.overallResults?.fear, res?.data?.overallResults?.joy, res?.data?.overallResults?.sadness, res?.data?.overallResults?.surprise, res?.data?.overallResults?.trust],
-                                fill: true,
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                borderColor: 'rgb(54, 162, 235)',
-                                pointBackgroundColor: 'rgb(54, 162, 235)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgb(54, 162, 235)'
-                            }
-                        ]
-                    },
-                    options: {
-                        elements: {
-                            line: {
-                                borderWidth: 3
-                            }
-                        }
-                    }
-                });
-        });
 
-        const ctx = document.getElementById(`myChart-2`).getContext('2d');
+    function BeginProfiling() {
+        document.getElementById("loader").classList.remove("d-none");
+
+
+        /*Get the chart data*/
+    axios.post('/engine/GetOverallResult',
+        {
+            userId: '@(user.user_id)'
+        }).then((res) => {
+
+        /*user items*/
+
+            document.getElementById("profile_details").innerHTML =
+                `
+
+                 <div class="col-4">
+                     <div class="mt-1">
+                         <h4>${res.data.timeline.User.data.public_metrics.tweet_count}</h4>
+                         <p class="mb-0 text-muted">Tweets</p>
+                     </div>
+                 </div>
+<div class="col-4">
+    <div class="mt-1">
+        <h4>${res.data.timeline.User.data.public_metrics.followers_count}</h4>
+        <p class="mb-0 text-muted">Followers</p>
+    </div>
+</div>
+<div class="col-4">
+    <div class="mt-1">
+        <h4>${res.data.timeline.User.data.public_metrics.following_count}</h4>
+        <p class="mb-0 text-muted">Following</p>
+    </div>
+</div>
+`;
+
+            var recent_tweets = "";
+            for (var i = 0; i < 5 && i < res.data.timeline.Tweets.length; i++) {
+                const item = res.data.timeline.Tweets[i];
+                recent_tweets += ` <li class="list-group-item">${item.text} <span class="text-muted"> - ${new Date(item.created_at).toLocaleString()}</span></li>`;
+            }
+            document.getElementById("recent_tweet").innerHTML = recent_tweets;
+
+            var recent_retweet = "";
+            for (var i = 0; i < 5 && i < res.data.timeline.Retweets.length; i++) {
+                const item = res.data.timeline.Retweets[i];
+                recent_retweet += ` <li class="list-group-item">${item.text} <span class="text-muted"> - ${new Date(item.created_at).toLocaleString()}</span> ${item.parent_tweet ? `<br/>replied to:<br/> ${item.parent_tweet.text}` : ""}</li>`;
+            }
+            document.getElementById("recent_retweet").innerHTML = recent_retweet;
+
+            var recent_replies = "";
+            for (var i = 0; i < 5 && i < res.data.timeline.Replies.length; i++) {
+                const item = res.data.timeline.Replies[i];
+                recent_replies += ` <li class="list-group-item">${item.text} <span class="text-muted"> - ${new Date(item.created_at).toLocaleString()}</span> <br/>replied to:<br/> ${item.parent_tweet.text}</li>`;
+            }
+            document.getElementById("recent_replies").innerHTML = recent_replies;
+
+/*radar chart*/
+        const ctx = document.getElementById(`myChart-1`).getContext('2d');
         const myChart = new Chart(ctx,
             {
-                type: 'line',
+                type: 'radar',
                 data: {
                     labels: [
                         'Anger',
@@ -211,18 +210,15 @@
                     ],
                     datasets: [
                         {
-                            label: 'My First Dataset',
-                            data: [65, 59, 80, 81, 56, 55, 40],
-                            fill: false,
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'My Second Dataset',
-                            data: [100, 78, 23, 61, 75, 89, 31],
-                            fill: false,
-                            borderColor: 'rgb(255, 248, 220)',
-                            tension: 0.1
+                            label: 'Personality Scoring',
+                            data: [res?.data?.overallResults?.anger, res?.data?.overallResults?.anticipation, res?.data?.overallResults?.disgust, res?.data?.overallResults?.fear, res?.data?.overallResults?.joy, res?.data?.overallResults?.sadness, res?.data?.overallResults?.surprise, res?.data?.overallResults?.trust],
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            pointBackgroundColor: 'rgb(54, 162, 235)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(54, 162, 235)'
                         }
                     ]
                 },
@@ -234,5 +230,98 @@
                     }
                 }
             });
-    }
+
+            /*line chart*/
+        //make the labels
+        /*var labels = [];
+        for (var i = 1; i <= res.data.resultsOverTime.anger.length; i++) {
+            labels.push(`${i}`);
+            }
+        console.log(labels);*/
+        const ctx2 = document.getElementById(`myChart-2`).getContext('2d');
+            const myChart2 = new Chart(ctx2,
+       {
+           type: 'line',
+           data: {
+              labels: res.data.times,
+               datasets: [
+                   {
+                       label: "Anger",
+                       data: res.data.resultsOverTime.anger,
+                       fill: false,
+                       borderColor: 'rgb(255, 0, 0)',
+                       tension: 0.1
+                   },
+                   {
+                       label: "Disgust",
+                       data: res.data.resultsOverTime.disgust,
+                       fill: false,
+                       borderColor: 'rgb(0,255,0)',
+                       tension: 0.1
+                   },
+                   {
+                       label: "Surprise",
+                       data: res.data.resultsOverTime.surprise,
+                       fill: false,
+                       borderColor: 'rgb(0,255,255)',
+                       tension: 0.1
+                   },
+                   {
+                       label: "Trust",
+                       data: res.data.resultsOverTime.trust,
+                       fill: false,
+                       borderColor: 'rgb(0,0,255)',
+                       tension: 0.1
+                   },
+                   {
+                       label: "Anticipation",
+                       data: res.data.resultsOverTime.anticipation,
+                       fill: false,
+                       borderColor: 'rgb(165,42,42)',
+                       tension: 0.1
+                   },
+                   {
+                       label: "Fear",
+                       data: res.data.resultsOverTime.fear,
+                       fill: false,
+                       borderColor: 'rgb(0,0,0)',
+                       tension: 0.1
+                   },
+                   {
+                       label: "Joy",
+                       data: res.data.resultsOverTime.joy,
+                       fill: false,
+                       borderColor: 'rgb(255, 165, 0)',
+                       tension: 0.1
+                   }
+               ],
+
+
+
+           },
+           options: {
+               elements: {
+                   line: {
+                       borderWidth: 3
+                   }
+               }
+           }
+                });
+
+            /*loading complete*/
+        const loadings = document.querySelectorAll('.loadings');
+
+        loadings.forEach(load => {
+            load.remove();
+        });
+
+        document.getElementById("loader").classList.add("d-none");
+    });
+    };
+
+
+
+
+
+
 </script>

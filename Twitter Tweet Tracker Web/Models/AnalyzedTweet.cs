@@ -10,6 +10,8 @@ namespace Twitter_Tweet_Tracker_Web.Models.Twitter
         public string id { get; set; }
         public string text { get; set; }
 
+        public DateTime created_at { get; set; }
+
         /// <summary>
         /// the replies for this tweet
         /// </summary>
@@ -21,6 +23,8 @@ namespace Twitter_Tweet_Tracker_Web.Models.Twitter
     {
         public string id { get; set; }
         public string text { get; set; }
+
+        public DateTime created_at { get; set; }
         /// <summary>
         /// the parent tweet this reply belongs to
         /// </summary>

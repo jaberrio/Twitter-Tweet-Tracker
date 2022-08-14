@@ -16,4 +16,15 @@ namespace Twitter_Tweet_Tracker_Web.Models
         public float surprise { get; set; }
         public float trust { get; set; }
     }
+    public class AnalyzedTweetResultOverTime
+    {
+        public List<float> anger { get; set; }
+        public List<float> anticipation { get; set; }
+        public List<float> disgust { get; set; }
+        public List<float> fear { get; set; }
+        public List<float> joy { get; set; }
+        public List<float> sadness { get; set; }
+        public List<float> surprise { get; set; }
+        public List<float> trust { get; set; }
+    }
 }
